@@ -30,3 +30,9 @@ server_erlang: server_erlang.erl
 
 client: client.c
 	$(CC) $(CFLAGS) $< -o $@
+
+server_ocaml: server_ocaml.ml server_ocaml_epoll.c
+	ocamlopt -verbose -ccopt -O2 -inline 30 -unsafe -o $@ server_ocaml_epoll.c unix.cmxa server_ocaml.ml 
+
+clean::
+	rm -f server_ocaml server_ocaml.cm* server_ocaml*.o 
