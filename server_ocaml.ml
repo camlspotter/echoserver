@@ -103,7 +103,11 @@ module Conn = struct
 end
 
 let main () =
-  let procs = 1 in
+  let procs = 
+    let procs = ref 1 in
+    Arg.parse [ "-f", Arg.Int (fun i -> procs := i), "# of process to fork. Never tested." ] (fun _ -> ()) "server_ocaml <opts>";
+    !procs
+  in
 
   let listener = setup_server_socket port in
   prerr_endline "listening...";
@@ -141,9 +145,7 @@ let main () =
         Unix.set_nonblock client;
         Epoll.ctl_add epfd client client_flags;
         Hashtbl.add clients client (Conn.create ());
-(*
-        Format.eprintf "connected: %d@." (Obj.magic client);
-*)
+        (* Format.eprintf "connected: %d@." (Obj.magic client); *)
 
       end else 
         (* event on client *)
@@ -155,9 +157,7 @@ let main () =
           Epoll.ctl_del epfd fd;
           Unix.close fd;
           Hashtbl.remove clients fd;
-(*
-          Format.eprintf "closed: %d@." (Obj.magic fd);
-*)
+          (* Format.eprintf "closed: %d@." (Obj.magic fd); *)
         in
         try
           incr proc;
